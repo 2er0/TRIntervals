@@ -11,6 +11,8 @@ export function Session() {
 
     const [intervalList, setIntervalList] = useState<IntervalRow[]>([]);
     const [countdown, setCountdown] = useState<number>(0);
+    const [currentIntervalIndex, setCurrentIntervalIndex] = useState<number>(-1);
+
 
     const createCurrentIntervalList = (setActive: number) => {
         const currentIntervalList = selectedSessionData.map((sessionRow, index) => {
@@ -27,30 +29,35 @@ export function Session() {
         createCurrentIntervalList(-1);
     }, [selectedSessionData]);
 
-    const waitForCountdown = (countDown: number) => {
-        return new Promise<void>((resolve) => {
-            let currentCountdown = countDown;
-            setCountdown(currentCountdown);
-            const interval = setInterval(() => {
-                currentCountdown--;
-                setCountdown(currentCountdown);
-                if (currentCountdown === 0) {
-                    clearInterval(interval);
-                    resolve();
-                }
+    useEffect(() => {
+        let timer: number;
+        if (started && countdown > 0) {
+            timer = window.setInterval(() => {
+                setCountdown(prevCountdown => prevCountdown - 1);
             }, 1000);
-        });
-    }
-
-    const startSession = async () => {
-        // Start the session
-        setStarted(true);
-        for (let i = 0; i < intervalList.length; i++) {
-            createCurrentIntervalList(i);
-            setCountdown(intervalList[i].time);
-            await waitForCountdown(intervalList[i].time);
-
+        } else if (countdown === 0 && currentIntervalIndex >= 0) {
+            // @ts-ignore
+            clearInterval(timer);
+            if (currentIntervalIndex < intervalList.length - 1) {
+                setCurrentIntervalIndex(currentIntervalIndex + 1);
+                setCountdown(intervalList[currentIntervalIndex + 1].time);
+            } else {
+                setStarted(false);
+            }
         }
+        return () => clearInterval(timer);
+    }, [started, countdown, currentIntervalIndex]);
+
+    useEffect(() => {
+        if (currentIntervalIndex >= 0) {
+            createCurrentIntervalList(currentIntervalIndex);
+        }
+    }, [currentIntervalIndex]);
+
+    const startSession = () => {
+        setStarted(true);
+        setCurrentIntervalIndex(0);
+        setCountdown(intervalList[0].time);
     }
 
     return (
