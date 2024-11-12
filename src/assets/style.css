@@ -1,0 +1,36 @@
+:root {
+    --background-color: rgb(38, 38, 38);
+    --text-color: rgb(255, 255, 255);
+    --border-color: rgb(45, 45, 45);
+    --button-hover-color: rgb(4, 78, 14);
+    --button-bg-color: rgb(5, 116, 20);
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+button {
+    background-color: var(--button-bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+button:hover {
+    background-color: var(--button-hover-color);
+}
+
+.session-full-height {
+    height: calc(100vh - 100px); /* Adjust 60px to the height of your Header */
+}
+
+.border {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin: 2px 2px;
+}
